@@ -37,7 +37,7 @@ function miniAppKeyboard(url: string) {
   return Markup.inlineKeyboard([[Markup.button.webApp("Открыть Mini App", url)]]);
 }
 
-async function sendMiniAppEntry(ctx: { reply: (text: string, extra?: unknown) => Promise<unknown> }) {
+async function sendMiniAppEntry(ctx: any) {
   if (isValidPublicMiniAppUrl(config.miniAppUrl)) {
     await ctx.reply("Откройте Mini App по кнопке ниже.", miniAppKeyboard(config.miniAppUrl));
     return;
