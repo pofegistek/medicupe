@@ -1,16 +1,16 @@
 :root {
-  --bg: #0b1118;
-  --bg-elev: #121a24;
-  --card: #141f2a;
-  --card-soft: #1a2633;
-  --text: #e8edf4;
-  --muted: #98a7ba;
-  --accent: #4da3ff;
-  --accent-strong: #2d7fd7;
-  --ok: #63d3a2;
-  --warn: #f2bf62;
-  --danger: #ff7d7d;
-  --border: #263342;
+  --bg: #121519;
+  --bg-elev: #1a1f25;
+  --card: #1d232b;
+  --card-soft: #232b35;
+  --text: #dde3ea;
+  --muted: #98a2af;
+  --accent: #5b8f89;
+  --accent-strong: #4b7772;
+  --ok: #7db79d;
+  --warn: #c8a772;
+  --danger: #d58f8f;
+  --border: #313a46;
 }
 
 * {
@@ -27,8 +27,8 @@ body {
   margin: 0;
   font-family: "SF Pro Text", "Segoe UI", "Inter", sans-serif;
   background:
-    radial-gradient(1200px 460px at 20% -10%, #1f2f46 0%, rgba(31, 47, 70, 0) 70%),
-    radial-gradient(900px 520px at 100% -20%, #172738 0%, rgba(23, 39, 56, 0) 70%),
+    radial-gradient(1000px 460px at 18% -10%, #252c35 0%, rgba(37, 44, 53, 0) 68%),
+    radial-gradient(900px 520px at 100% -20%, #1e252e 0%, rgba(30, 37, 46, 0) 68%),
     var(--bg);
   color: var(--text);
 }
@@ -47,7 +47,7 @@ body {
   display: inline-block;
   font-size: 12px;
   font-weight: 600;
-  color: #aac7e6;
+  color: #aab8c9;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -80,24 +80,24 @@ body {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg-elev);
-  color: #c3d1e0;
+  color: #bcc6d2;
   font-size: 14px;
   font-weight: 600;
 }
 
 .tabs button.active {
-  border-color: #3f5f80;
-  background: linear-gradient(180deg, #223247 0%, #1a2736 100%);
-  color: #f4f9ff;
+  border-color: #49685f;
+  background: linear-gradient(180deg, #2b3633 0%, #242f2d 100%);
+  color: #e4ece8;
 }
 
 .card {
-  background: linear-gradient(180deg, #182331 0%, #141f2a 100%);
+  background: linear-gradient(180deg, #212832 0%, #1c232c 100%);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 14px;
   margin-bottom: 10px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
 }
 
 .card-head {
@@ -126,7 +126,7 @@ body {
 .tile {
   width: 100%;
   min-height: 56px;
-  border: 1px solid #324356;
+  border: 1px solid #3b4655;
   border-radius: 12px;
   background: var(--card-soft);
   color: var(--text);
@@ -143,8 +143,8 @@ body {
 }
 
 .tile.active {
-  border-color: #4d8bc5;
-  background: linear-gradient(180deg, #223953 0%, #1d3248 100%);
+  border-color: #5f877e;
+  background: linear-gradient(180deg, #2c383a 0%, #273235 100%);
 }
 
 .tile-name {
@@ -156,19 +156,19 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  border: 1px solid #4e6075;
+  border: 1px solid #5b6878;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #9fb0c4;
+  color: #aab4c1;
   font-size: 16px;
   flex-shrink: 0;
 }
 
 .tile-check.on {
-  border-color: #78b5f0;
-  background: #2e5f91;
-  color: #ecf7ff;
+  border-color: #6f9f93;
+  background: #476962;
+  color: #eef5f2;
 }
 
 .date-switcher {
@@ -183,7 +183,7 @@ body {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg-elev);
-  color: var(--text);
+  color: #d5dce5;
   font-weight: 600;
 }
 
@@ -200,13 +200,14 @@ button {
   margin-top: 12px;
   font-weight: 700;
   min-height: 48px;
-  border-color: #4b78a3;
+  border-color: #557e77;
   background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
-  color: #f6fbff;
+  color: #eef5f3;
 }
 
 .save-btn:disabled {
-  opacity: 0.45;
+  opacity: 0.58;
+  filter: saturate(0.72);
 }
 
 .unsaved,
@@ -257,13 +258,13 @@ button {
 }
 
 .day.selected {
-  border-color: #5c8fc2;
-  background: #22364b;
+  border-color: #628a81;
+  background: #2a3537;
 }
 
 .day small {
   font-size: 10px;
-  color: #a8c9ea;
+  color: #a9c5bc;
 }
 
 .meta,
@@ -286,15 +287,15 @@ button {
 }
 
 .error {
-  background: rgba(176, 48, 48, 0.2);
-  color: #ffc2c2;
-  border: 1px solid rgba(215, 84, 84, 0.45);
+  background: rgba(132, 76, 76, 0.22);
+  color: #e5c1c1;
+  border: 1px solid rgba(148, 93, 93, 0.48);
 }
 
 .info {
-  background: rgba(66, 110, 155, 0.22);
-  color: #cae5ff;
-  border: 1px solid rgba(99, 145, 194, 0.4);
+  background: rgba(84, 103, 123, 0.24);
+  color: #d4dee9;
+  border: 1px solid rgba(104, 123, 143, 0.4);
 }
 
 @media (max-width: 420px) {
