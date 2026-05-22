@@ -18,7 +18,9 @@ function isAdmin(telegramId: string) {
 
 async function sendProceduresList(chatId: number) {
   const procedures = await prisma.procedure.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
-  const rows = procedures.map((p) => [Markup.button.callback(p.name, `proc:${p.id}`)]);
+  const rows = procedures.map((p: { id: number; name: string }) => [
+    Markup.button.callback(p.name, `proc:${p.id}`)
+  ]);
   await bot.telegram.sendMessage(chatId, "Список процедур:", Markup.inlineKeyboard(rows));
 }
 
@@ -93,7 +95,9 @@ bot.action(/toggle:(\d+)/, async (ctx) => {
   });
 
   await ctx.reply(`Готово: процедура ${p.name} теперь ${!p.isVisible ? "видима" : "скрыта"}.`);
-  await sendProceduresList(ctx.chat.id);
+  if (ctx.chat) {
+    await sendProceduresList(ctx.chat.id);
+  }
 });
 
 bot.on("text", async (ctx) => {
@@ -118,7 +122,9 @@ bot.on("text", async (ctx) => {
   }
 
   pendingByUser.delete(userId);
-  await sendProceduresList(ctx.chat.id);
+  if (ctx.chat) {
+    await sendProceduresList(ctx.chat.id);
+  }
 });
 
 async function start() {

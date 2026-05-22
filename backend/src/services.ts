@@ -33,7 +33,10 @@ export async function getDayState(userId: number, date: string) {
 
   for (const dayPart of DAY_PARTS) {
     for (const proc of procedures) {
-      const entry = entries.find((e) => e.dayPart === dayPart && e.procedureId === proc.id);
+      const entry = entries.find(
+        (e: { dayPart: string; procedureId: number }) =>
+          e.dayPart === dayPart && e.procedureId === proc.id
+      );
       payload[dayPart][String(proc.id)] = Boolean(entry?.completed);
     }
   }
