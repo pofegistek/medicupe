@@ -78,14 +78,12 @@ npm run bot
 - `ADMIN_TELEGRAM_ID`
 - `MINI_APP_URL`
 - `BACKEND_PUBLIC_URL`
-- `DB_PROVIDER`
 - `DATABASE_URL`
 - `VITE_API_BASE_URL`
 
 ## Миграция SQLite -> PostgreSQL
 
-- В `.env` поменять:
-  - `DB_PROVIDER=postgresql`
-  - `DATABASE_URL=postgresql://...`
+- В `backend/prisma/schema.prisma` поменять datasource provider на `postgresql`.
+- В `.env` указать `DATABASE_URL=postgresql://...`.
 - Перезапустить Prisma миграции в новой среде.
 - Бизнес-логика и API остаются теми же.
