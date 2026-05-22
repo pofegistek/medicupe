@@ -10,7 +10,7 @@
 5. После push в `main` workflow `Deploy Frontend to GitHub Pages` опубликует frontend.
 
 Ожидаемый URL:
-- `https://pofegistek.github.io/medicube/`
+- `https://pofegistek.github.io/medicupe/`
 
 ## 2. BotFather
 
@@ -26,7 +26,7 @@
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_WEBAPP_BOT_TOKEN`
    - `ADMIN_TELEGRAM_ID`
-   - `MINI_APP_URL=https://pofegistek.github.io/medicube/`
+   - `MINI_APP_URL=https://pofegistek.github.io/medicupe/`
    - `BACKEND_PUBLIC_URL=https://api.your-domain.com`
    - `DATABASE_URL=file:./prisma/dev.db`
 4. Запустить:

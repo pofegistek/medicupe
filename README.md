@@ -55,7 +55,7 @@ npm run bot
 
 ## GitHub Pages URL
 
-Для репозитория `pofegistek/medicube` URL будет:
+Для репозитория `pofegistek/medicupe` URL будет:
 
-`https://pofegistek.github.io/medicube/`
+`https://pofegistek.github.io/medicupe/`
 
