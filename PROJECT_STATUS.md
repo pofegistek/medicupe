@@ -25,6 +25,8 @@
 - Remote настроен.
 - Секреты не должны попадать в tracked файлы (`.env` игнорируется).
 - На VPS контейнеры собирались и запускались.
+- GitHub Pages workflow успешно выполнен для `main`.
+- URL `https://pofegistek.github.io/medicupe/` отвечает `HTTP 200`.
 
 ## Что осталось
 
@@ -56,4 +58,4 @@
 
 - Держать только backend/bot/db.
 - Настроить HTTPS reverse proxy для API.
-
+- `MINI_APP_URL` на VPS обновлен на `https://pofegistek.github.io/medicupe/`.
