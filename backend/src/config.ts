@@ -5,14 +5,28 @@ dotenv.config();
 const required = [
   "DATABASE_URL",
   "TELEGRAM_WEBAPP_BOT_TOKEN",
-  "TELEGRAM_BOT_TOKEN",
-  "ADMIN_TELEGRAM_ID"
+  "TELEGRAM_BOT_TOKEN"
 ] as const;
 
 for (const key of required) {
   if (!process.env[key]) {
     throw new Error(`Missing env var: ${key}`);
   }
+}
+
+function parseAdminIds() {
+  const single = process.env.ADMIN_TELEGRAM_ID || "";
+  const many = process.env.ADMIN_TELEGRAM_IDS || "";
+  const merged = `${single},${many}`
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return Array.from(new Set(merged));
+}
+
+const adminTelegramIds = parseAdminIds();
+if (adminTelegramIds.length === 0) {
+  throw new Error("Missing env var: ADMIN_TELEGRAM_ID or ADMIN_TELEGRAM_IDS");
 }
 
 export const config = {
@@ -23,5 +37,5 @@ export const config = {
   dbProvider: process.env.DB_PROVIDER || "sqlite",
   telegramWebAppBotToken: process.env.TELEGRAM_WEBAPP_BOT_TOKEN as string,
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN as string,
-  adminTelegramId: process.env.ADMIN_TELEGRAM_ID as string
+  adminTelegramIds
 };

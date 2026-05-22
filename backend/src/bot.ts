@@ -4,7 +4,7 @@ import { prisma } from "./db.js";
 import { ensureDefaultProcedures } from "./seed.js";
 
 const bot = new Telegraf(config.telegramBotToken);
-const adminId = config.adminTelegramId;
+const adminIds = new Set(config.adminTelegramIds);
 
 type PendingAction =
   | { type: "edit_description"; procedureId: number }
@@ -13,7 +13,7 @@ type PendingAction =
 const pendingByUser = new Map<string, PendingAction>();
 
 function isAdmin(telegramId: string) {
-  return telegramId === adminId;
+  return adminIds.has(telegramId);
 }
 
 function isValidPublicMiniAppUrl(url: string): boolean {
