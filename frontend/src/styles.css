@@ -93,6 +93,35 @@ button {
   background: #fff;
 }
 
+.save-btn {
+  width: 100%;
+  margin-top: 10px;
+  font-weight: 600;
+  min-height: 44px;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+}
+
+.unsaved {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #7a4f00;
+}
+
+.saved {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #0f5f59;
+}
+
+.save-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #8a2525;
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));

@@ -15,6 +15,7 @@ import { isoDate, isoMonth, ruDateLabel } from "./date";
 
 type Tab = "today" | "calendar" | "history" | "procedures";
 type TelegramState = "checking" | "inside" | "outside";
+type DayPart = "morning" | "evening";
 
 const emptyState: DayState = { morning: {}, evening: {} };
 
@@ -39,7 +40,7 @@ async function detectInitData(): Promise<{ initData: string; inside: boolean }> 
   return { initData: "", inside: hasTelegramWebApp };
 }
 
-function byDayPart(procedures: Procedure[], dayPart: "morning" | "evening") {
+function byDayPart(procedures: Procedure[], dayPart: DayPart) {
   const allowed = dayPart === "morning" ? MORNING_SLUGS : EVENING_SLUGS;
   return procedures.filter((p) => allowed.has(p.slug));
 }
@@ -55,13 +56,22 @@ export function App() {
   const [telegramState, setTelegramState] = useState<TelegramState>("checking");
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [dayState, setDayState] = useState<DayState>(emptyState);
+
+  const [savedDayState, setSavedDayState] = useState<DayState>(emptyState);
+  const [draftDayState, setDraftDayState] = useState<DayState>(emptyState);
+
   const [monthMarks, setMonthMarks] = useState<Record<string, { morning: number; evening: number }>>({});
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const [proceduresLoading, setProceduresLoading] = useState(false);
   const [dayLoading, setDayLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  const [savingMorning, setSavingMorning] = useState(false);
+  const [savingEvening, setSavingEvening] = useState(false);
+
+  const [morningStatus, setMorningStatus] = useState("");
+  const [eveningStatus, setEveningStatus] = useState("");
 
   const [error, setError] = useState("");
 
@@ -120,7 +130,10 @@ export function App() {
     setDayLoading(true);
     fetchDay(token, selectedIso)
       .then((data) => {
-        setDayState(data);
+        setSavedDayState(data);
+        setDraftDayState(data);
+        setMorningStatus("");
+        setEveningStatus("");
         setError("");
       })
       .catch((e) => setError((e as Error).message))
@@ -144,7 +157,7 @@ export function App() {
       })
       .catch((e) => setError((e as Error).message))
       .finally(() => setHistoryLoading(false));
-  }, [token, dayState]);
+  }, [token, savedDayState]);
 
   const calendarDays = useMemo(() => {
     const first = startOfMonth(selectedDate);
@@ -167,23 +180,91 @@ export function App() {
     return days;
   }, [selectedDate]);
 
-  const toggle = async (dayPart: "morning" | "evening", procedureId: number, checked: boolean) => {
+  const listMorning = byDayPart(procedures, "morning");
+  const listEvening = byDayPart(procedures, "evening");
+
+  const isDirty = (dayPart: DayPart, list: Procedure[]) =>
+    list.some((p) => {
+      const key = String(p.id);
+      return Boolean(draftDayState[dayPart][key]) !== Boolean(savedDayState[dayPart][key]);
+    });
+
+  const dirtyMorning = isDirty("morning", listMorning);
+  const dirtyEvening = isDirty("evening", listEvening);
+
+  const hasUnsavedChanges = dirtyMorning || dirtyEvening;
+
+  function confirmDiscardChanges(): boolean {
+    if (!hasUnsavedChanges) return true;
+    return window.confirm("Есть несохраненные изменения. Перейти без сохранения?");
+  }
+
+  const changeDateWithGuard = (nextDate: Date, nextTab: Tab = "today") => {
+    if (!confirmDiscardChanges()) return;
+    setSelectedDate(nextDate);
+    setTab(nextTab);
+  };
+
+  const toggleDraft = (dayPart: DayPart, procedureId: number, checked: boolean) => {
+    const key = String(procedureId);
+    setDraftDayState((prev) => ({
+      ...prev,
+      [dayPart]: {
+        ...prev[dayPart],
+        [key]: checked
+      }
+    }));
+
+    if (dayPart === "morning") setMorningStatus("");
+    if (dayPart === "evening") setEveningStatus("");
+  };
+
+  const saveDayPart = async (dayPart: DayPart, list: Procedure[]) => {
     if (!token) return;
+
+    const setSaving = dayPart === "morning" ? setSavingMorning : setSavingEvening;
+    const setStatus = dayPart === "morning" ? setMorningStatus : setEveningStatus;
+
+    const changed = list.filter((p) => {
+      const key = String(p.id);
+      return Boolean(draftDayState[dayPart][key]) !== Boolean(savedDayState[dayPart][key]);
+    });
+
+    if (changed.length === 0) return;
+
+    setSaving(true);
+    setStatus("");
+
     try {
-      await updateCheck(token, { date: selectedIso, dayPart, procedureId, completed: checked });
-      const [nextState, nextMonth] = await Promise.all([
+      await Promise.all(
+        changed.map((p) =>
+          updateCheck(token, {
+            date: selectedIso,
+            dayPart,
+            procedureId: p.id,
+            completed: Boolean(draftDayState[dayPart][String(p.id)])
+          })
+        )
+      );
+
+      const [freshDay, freshMonth] = await Promise.all([
         fetchDay(token, selectedIso),
         fetchMonth(token, isoMonth(selectedDate))
       ]);
-      setDayState(nextState);
-      setMonthMarks(nextMonth);
+
+      setSavedDayState(freshDay);
+      setDraftDayState(freshDay);
+      setMonthMarks(freshMonth);
+      setStatus("Сохранено");
       setError("");
-    } catch (e) {
-      setError((e as Error).message);
+    } catch {
+      setStatus("Не удалось сохранить. Проверьте соединение и попробуйте еще раз.");
+    } finally {
+      setSaving(false);
     }
   };
 
-  const renderChecklist = (dayPart: "morning" | "evening", title: string) => {
+  const renderChecklist = (dayPart: DayPart, title: string, list: Procedure[]) => {
     if (proceduresLoading || dayLoading) {
       return (
         <section className="card">
@@ -202,7 +283,6 @@ export function App() {
       );
     }
 
-    const list = byDayPart(procedures, dayPart);
     if (list.length === 0) {
       return (
         <section className="card">
@@ -212,6 +292,10 @@ export function App() {
       );
     }
 
+    const dirty = dayPart === "morning" ? dirtyMorning : dirtyEvening;
+    const saving = dayPart === "morning" ? savingMorning : savingEvening;
+    const status = dayPart === "morning" ? morningStatus : eveningStatus;
+
     return (
       <section className="card">
         <h3>{title}</h3>
@@ -219,12 +303,24 @@ export function App() {
           <label key={`${dayPart}-${p.id}`} className="check-row">
             <input
               type="checkbox"
-              checked={Boolean(dayState[dayPart][String(p.id)])}
-              onChange={(e) => toggle(dayPart, p.id, e.target.checked)}
+              checked={Boolean(draftDayState[dayPart][String(p.id)])}
+              onChange={(e) => toggleDraft(dayPart, p.id, e.target.checked)}
             />
             <span>{safeProcedureName(p)}</span>
           </label>
         ))}
+
+        {dirty && <p className="unsaved">Есть несохраненные изменения</p>}
+
+        <button
+          className="save-btn"
+          disabled={!dirty || saving}
+          onClick={() => saveDayPart(dayPart, list)}
+        >
+          {saving ? "Сохранение..." : dayPart === "morning" ? "Сохранить утро" : "Сохранить вечер"}
+        </button>
+
+        {status && <p className={status === "Сохранено" ? "saved" : "save-error"}>{status}</p>}
       </section>
     );
   };
@@ -254,12 +350,12 @@ export function App() {
       {tab === "today" && (
         <>
           <section className="card date-switcher">
-            <button onClick={() => setSelectedDate(subDays(selectedDate, 1))}>← Вчера</button>
-            <button onClick={() => setSelectedDate(new Date())}>Сегодня</button>
-            <button onClick={() => setSelectedDate(addDays(selectedDate, 1))}>Завтра →</button>
+            <button onClick={() => changeDateWithGuard(subDays(selectedDate, 1))}>← Вчера</button>
+            <button onClick={() => changeDateWithGuard(new Date())}>Сегодня</button>
+            <button onClick={() => changeDateWithGuard(addDays(selectedDate, 1))}>Завтра →</button>
           </section>
-          {renderChecklist("morning", "Утро")}
-          {renderChecklist("evening", "Вечер")}
+          {renderChecklist("morning", "Утро", listMorning)}
+          {renderChecklist("evening", "Вечер", listEvening)}
         </>
       )}
 
@@ -281,10 +377,7 @@ export function App() {
                 <button
                   key={key}
                   className={`day ${inMonth ? "" : "muted"} ${selected ? "selected" : ""}`}
-                  onClick={() => {
-                    setSelectedDate(d);
-                    setTab("today");
-                  }}
+                  onClick={() => changeDateWithGuard(d, "today")}
                 >
                   <span>{d.getDate()}</span>
                   {marks && <small>{marks.morning + marks.evening} отметок</small>}
