@@ -7,6 +7,8 @@
 3. `Build and deployment -> Source: GitHub Actions`.
 4. `Settings -> Secrets and variables -> Actions -> Variables`:
    - `VITE_API_BASE_URL=https://api.your-domain.com/api`
+   - или временно без покупки домена:
+     - `VITE_API_BASE_URL=https://89-22-236-42.nip.io:8444/api`
 5. После push в `main` workflow `Deploy Frontend to GitHub Pages` публикует frontend.
 
 URL Mini App:
@@ -49,11 +51,10 @@ docker compose up -d --build
 
 ### Временный тестовый вариант
 
-- HTTPS туннель (например Cloudflare Tunnel)
-- Только как временное решение
-- Для текущего временного запуска можно использовать URL вида:
-  - `https://<random>.trycloudflare.com/api`
-- Этот URL нестабилен и может измениться/исчезнуть, поэтому позже его нужно заменить на постоянный домен API.
+- Без покупки домена можно использовать `nip.io` + reverse proxy + Let's Encrypt:
+  - пример: `https://89-22-236-42.nip.io:8444/api`
+- Этот вариант стабильнее случайных tunnel URL, но все равно остается техническим компромиссом.
+- Для полноценного production лучше перейти на собственный домен API.
 
 ## 5. После обновлений backend
 

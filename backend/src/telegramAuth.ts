@@ -25,6 +25,11 @@ export function verifyTelegramInitData(initDataRaw: string): TelegramUser {
     throw new Error("Некорректные init data");
   }
 
+  const authDateUnix = Number(authDate);
+  if (!Number.isFinite(authDateUnix) || authDateUnix <= 0) {
+    throw new Error("Некорректный auth_date в init data");
+  }
+
   const dataCheckString = [...params.entries()]
     .filter(([key]) => key !== "hash")
     .sort(([a], [b]) => a.localeCompare(b))
@@ -43,6 +48,12 @@ export function verifyTelegramInitData(initDataRaw: string): TelegramUser {
 
   if (calculatedHash !== hash) {
     throw new Error("Подпись Telegram init data не прошла проверку");
+  }
+
+  const nowUnix = Math.floor(Date.now() / 1000);
+  const maxAge = Math.max(60, config.telegramAuthMaxAgeSeconds);
+  if (nowUnix - authDateUnix > maxAge) {
+    throw new Error("Сессия Telegram устарела. Откройте Mini App заново.");
   }
 
   const user = JSON.parse(userRaw) as TelegramUser;

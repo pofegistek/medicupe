@@ -55,6 +55,18 @@ npm run bot
 - `DATABASE_URL`
 - `VITE_API_BASE_URL`
 - `VITE_BASE_PATH`
+- `CORS_ALLOWED_ORIGINS` (список origin через запятую для backend CORS)
+- `TELEGRAM_AUTH_MAX_AGE_SECONDS` (макс. возраст `initData` для anti-replay)
+- `API_RATE_LIMIT_WINDOW_MS` / `API_RATE_LIMIT_MAX`
+- `AUTH_RATE_LIMIT_WINDOW_MS` / `AUTH_RATE_LIMIT_MAX`
+
+## Безопасность API
+
+- Публичный URL API не считается секретом; защита строится на валидации Telegram `initData`.
+- Все персональные endpoint'ы (`calendar`, `supplements`, `history`) требуют Bearer-токен, выпущенный из валидного `initData`.
+- Backend не принимает `userId` от frontend и всегда определяет пользователя по проверенному Telegram контексту.
+- Добавлена проверка свежести `auth_date` (`TELEGRAM_AUTH_MAX_AGE_SECONDS`), чтобы снизить риск replay старых токенов.
+- Добавлен базовый rate limiting для публичного API и отдельный лимит для `/api/auth/telegram`.
 
 ## Mini App URL в боте
 

@@ -20,6 +20,11 @@
 - Сегрегация данных по пользователям сохраняется:
   - фильтрация по `telegram user id` из проверенного `initData`
   - пользователи не видят чужие записи.
+- Проведен security review публичного API:
+  - включен whitelist CORS через `CORS_ALLOWED_ORIGINS`
+  - добавлен rate limit на весь API и отдельный stricter limit на `/api/auth/telegram`
+  - добавлена проверка свежести `auth_date` (`TELEGRAM_AUTH_MAX_AGE_SECONDS`) для anti-replay
+  - подтверждено, что backend не принимает доверенный `userId` от frontend.
 
 ## Что проверено
 
@@ -27,6 +32,7 @@
 - Проверено, что в tracked-файлах нет секретов.
 - Проверен push в `main` и успешный деплой GitHub Pages после последних UI-изменений.
 - На VPS бот обновлен и работает с несколькими админами (`ADMIN_TELEGRAM_ID` + `ADMIN_TELEGRAM_IDS`).
+- Проверено, что `sshd` на VPS работает с `PasswordAuthentication no` и `PubkeyAuthentication yes`.
 
 ## Что осталось
 
