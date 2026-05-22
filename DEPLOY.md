@@ -27,6 +27,7 @@ URL Mini App:
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_WEBAPP_BOT_TOKEN`
    - `ADMIN_TELEGRAM_ID`
+   - `ADMIN_TELEGRAM_IDS` (опционально, например `317647581,241209515`)
    - `MINI_APP_URL=https://pofegistek.github.io/medicupe/`
    - `BACKEND_PUBLIC_URL=https://api.your-domain.com`
    - `DATABASE_URL=file:./prisma/dev.db`
@@ -54,7 +55,16 @@ docker compose up -d --build
   - `https://<random>.trycloudflare.com/api`
 - Этот URL нестабилен и может измениться/исчезнуть, поэтому позже его нужно заменить на постоянный домен API.
 
-## 5. Важно
+## 5. После обновлений backend
+
+- В релизе с вкладкой `Добавки` добавлены новые таблицы Prisma (`Supplement`, `SupplementEntry`).
+- Применение схемы на VPS выполняется при старте контейнеров через `prisma db push` (уже встроено в команды запуска backend/bot).
+- Проверьте после деплоя:
+  - `/api/health`
+  - загрузку вкладки `Добавки` в Mini App
+  - сохранение утро/день/вечер и отображение в `История`.
+
+## 6. Важно
 
 - Не коммитить `.env`
 - Не хранить токены/пароли/ключи в репозитории

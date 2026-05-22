@@ -3,7 +3,7 @@ import express from "express";
 import { config } from "./config.js";
 import { prisma } from "./db.js";
 import { router } from "./routes.js";
-import { ensureDefaultProcedures } from "./seed.js";
+import { ensureDefaultProcedures, ensureDefaultSupplements } from "./seed.js";
 
 const app = express();
 
@@ -13,6 +13,7 @@ app.use("/api", router);
 
 async function bootstrap() {
   await ensureDefaultProcedures();
+  await ensureDefaultSupplements();
   app.listen(config.port, () => {
     console.log(`Medicube backend listening on :${config.port}`);
   });

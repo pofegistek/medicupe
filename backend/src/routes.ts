@@ -8,12 +8,17 @@ import {
   getDayState,
   getHistory,
   getMonthMarks,
+  getSupplementDayState,
   getVisibleProcedures,
+  getVisibleSupplements,
   isProcedureAllowedForDayPart,
-  setDayState
+  isSupplementAllowedForDayPart,
+  setDayState,
+  setSupplementDayState
 } from "./services.js";
 
 const dayPartSchema = z.enum(["morning", "evening"]);
+const supplementDayPartSchema = z.enum(["morning", "day", "evening"]);
 
 export const router = Router();
 
@@ -44,6 +49,11 @@ router.get("/procedures", async (_req, res) => {
   return res.json(procedures);
 });
 
+router.get("/supplements", async (_req, res) => {
+  const supplements = await getVisibleSupplements();
+  return res.json(supplements);
+});
+
 router.get("/calendar/day", async (req, res) => {
   const schema = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) });
   const parsed = schema.safeParse(req.query);
@@ -53,6 +63,18 @@ router.get("/calendar/day", async (req, res) => {
 
   const appUser = await ensureUser(String(req.telegramUser!.id));
   const state = await getDayState(appUser.id, parsed.data.date);
+  return res.json(state);
+});
+
+router.get("/supplements/day", async (req, res) => {
+  const schema = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) });
+  const parsed = schema.safeParse(req.query);
+  if (!parsed.success) {
+    return res.status(400).json({ error: "date должен быть YYYY-MM-DD" });
+  }
+
+  const appUser = await ensureUser(String(req.telegramUser!.id));
+  const state = await getSupplementDayState(appUser.id, parsed.data.date);
   return res.json(state);
 });
 
@@ -84,6 +106,40 @@ router.put("/calendar/day", async (req, res) => {
     parsed.data.date,
     parsed.data.dayPart,
     parsed.data.procedureId,
+    parsed.data.completed
+  );
+
+  return res.json({ ok: true });
+});
+
+router.put("/supplements/day", async (req, res) => {
+  const schema = z.object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    dayPart: supplementDayPartSchema,
+    supplementId: z.number().int().positive(),
+    completed: z.boolean()
+  });
+
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const supplement = await prisma.supplement.findUnique({ where: { id: parsed.data.supplementId } });
+  if (!supplement || !supplement.isVisible) {
+    return res.status(404).json({ error: "Добавка не найдена" });
+  }
+
+  if (!isSupplementAllowedForDayPart(supplement.slug, parsed.data.dayPart)) {
+    return res.status(400).json({ error: "Эта добавка недоступна для выбранного времени суток" });
+  }
+
+  const appUser = await ensureUser(String(req.telegramUser!.id));
+  await setSupplementDayState(
+    appUser.id,
+    parsed.data.date,
+    parsed.data.dayPart,
+    parsed.data.supplementId,
     parsed.data.completed
   );
 

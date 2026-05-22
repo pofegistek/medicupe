@@ -12,15 +12,44 @@ export type Procedure = {
   isVisible: boolean;
 };
 
+export type Supplement = {
+  id: number;
+  slug: string;
+  name: string;
+  isVisible: boolean;
+};
+
 export type DayState = {
   morning: Record<string, boolean>;
   evening: Record<string, boolean>;
 };
 
+export type SupplementDayState = {
+  morning: Record<string, boolean>;
+  day: Record<string, boolean>;
+  evening: Record<string, boolean>;
+};
+
 export type HistoryItem = {
   date: string;
-  morning: string[];
-  evening: string[];
+  care: {
+    morning: string[];
+    evening: string[];
+  };
+  supplements: {
+    morning: string[];
+    day: string[];
+    evening: string[];
+  };
+};
+
+export type MonthMark = {
+  morning: number;
+  day: number;
+  evening: number;
+  care: number;
+  supplements: number;
+  total: number;
 };
 
 async function request<T>(path: string, token: string, options?: RequestInit): Promise<T> {
@@ -85,8 +114,16 @@ export function fetchProcedures(token: string) {
   return request<Procedure[]>("/procedures", token);
 }
 
+export function fetchSupplements(token: string) {
+  return request<Supplement[]>("/supplements", token);
+}
+
 export function fetchDay(token: string, date: string) {
   return request<DayState>(`/calendar/day?date=${date}`, token);
+}
+
+export function fetchSupplementDay(token: string, date: string) {
+  return request<SupplementDayState>(`/supplements/day?date=${date}`, token);
 }
 
 export function updateCheck(
@@ -99,11 +136,23 @@ export function updateCheck(
   });
 }
 
+export function updateSupplementCheck(
+  token: string,
+  payload: {
+    date: string;
+    dayPart: "morning" | "day" | "evening";
+    supplementId: number;
+    completed: boolean;
+  }
+) {
+  return request<{ ok: boolean }>("/supplements/day", token, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+}
+
 export function fetchMonth(token: string, month: string) {
-  return request<Record<string, { morning: number; evening: number }>>(
-    `/calendar/month?month=${month}`,
-    token
-  );
+  return request<Record<string, MonthMark>>(`/calendar/month?month=${month}`, token);
 }
 
 export function fetchHistory(token: string, limit = 30) {

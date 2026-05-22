@@ -1,7 +1,7 @@
 import { Markup, Telegraf } from "telegraf";
 import { config } from "./config.js";
 import { prisma } from "./db.js";
-import { ensureDefaultProcedures } from "./seed.js";
+import { ensureDefaultProcedures, ensureDefaultSupplements } from "./seed.js";
 
 const bot = new Telegraf(config.telegramBotToken);
 const adminIds = new Set(config.adminTelegramIds);
@@ -161,6 +161,7 @@ bot.on("text", async (ctx) => {
 
 async function start() {
   await ensureDefaultProcedures();
+  await ensureDefaultSupplements();
   await bot.launch();
   console.log("Medicube admin bot started");
 }

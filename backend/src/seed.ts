@@ -1,5 +1,5 @@
 import { prisma } from "./db.js";
-import { DEFAULT_PROCEDURES } from "./constants.js";
+import { DEFAULT_PROCEDURES, DEFAULT_SUPPLEMENTS } from "./constants.js";
 
 export async function ensureDefaultProcedures() {
   for (const item of DEFAULT_PROCEDURES) {
@@ -17,6 +17,25 @@ export async function ensureDefaultProcedures() {
         description: item.description,
         note: item.note,
         type: item.type,
+        sortOrder: item.sortOrder,
+        isVisible: true
+      }
+    });
+  }
+}
+
+export async function ensureDefaultSupplements() {
+  for (const item of DEFAULT_SUPPLEMENTS) {
+    await prisma.supplement.upsert({
+      where: { slug: item.slug },
+      update: {
+        name: item.name,
+        sortOrder: item.sortOrder,
+        isVisible: true
+      },
+      create: {
+        slug: item.slug,
+        name: item.name,
         sortOrder: item.sortOrder,
         isVisible: true
       }

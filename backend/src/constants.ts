@@ -1,4 +1,5 @@
 export const DAY_PARTS = ["morning", "evening"] as const;
+export const SUPPLEMENT_DAY_PARTS = ["morning", "day", "evening"] as const;
 
 export const PROCEDURE_AVAILABILITY: Record<string, Array<(typeof DAY_PARTS)[number]>> = {
   "air-shot": ["morning", "evening"],
@@ -50,3 +51,25 @@ export const DEFAULT_PROCEDURES = [
     sortOrder: 5
   }
 ] as const;
+
+export const DEFAULT_SUPPLEMENTS = [
+  { slug: "omega-3", name: "Омега-3", sortOrder: 1 },
+  { slug: "vitamin-d", name: "Витамин D", sortOrder: 2 },
+  { slug: "b12", name: "B12", sortOrder: 3 },
+  { slug: "b9", name: "B9", sortOrder: 4 },
+  { slug: "collagen", name: "Коллаген", sortOrder: 5 },
+  { slug: "psyllium", name: "Псиллиум", sortOrder: 6 },
+  { slug: "iron", name: "Железо", sortOrder: 7 },
+  { slug: "magnesium", name: "Магний", sortOrder: 8 }
+] as const;
+
+export const SUPPLEMENT_AVAILABILITY: Record<string, Array<(typeof SUPPLEMENT_DAY_PARTS)[number]>> = {
+  "omega-3": ["morning", "day"],
+  "vitamin-d": ["morning", "day"],
+  b12: ["morning", "day"],
+  b9: ["morning", "day"],
+  collagen: ["morning", "day"],
+  psyllium: ["morning", "day"],
+  iron: ["morning", "day"],
+  magnesium: ["evening"]
+};
