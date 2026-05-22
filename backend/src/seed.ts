@@ -5,7 +5,12 @@ export async function ensureDefaultProcedures() {
   for (const item of DEFAULT_PROCEDURES) {
     await prisma.procedure.upsert({
       where: { slug: item.slug },
-      update: {},
+      update: {
+        name: item.name,
+        type: item.type,
+        sortOrder: item.sortOrder,
+        isVisible: true
+      },
       create: {
         slug: item.slug,
         name: item.name,

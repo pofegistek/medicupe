@@ -6,8 +6,10 @@ import { encodeInitDataToToken, verifyTelegramInitData } from "./telegramAuth.js
 import {
   ensureUser,
   getDayState,
+  getHistory,
   getMonthMarks,
   getVisibleProcedures,
+  isProcedureAllowedForDayPart,
   setDayState
 } from "./services.js";
 
@@ -72,6 +74,10 @@ router.put("/calendar/day", async (req, res) => {
     return res.status(404).json({ error: "Процедура не найдена" });
   }
 
+  if (!isProcedureAllowedForDayPart(procedure.slug, parsed.data.dayPart)) {
+    return res.status(400).json({ error: "Эта процедура недоступна для выбранного времени суток" });
+  }
+
   const appUser = await ensureUser(String(req.telegramUser!.id));
   await setDayState(
     appUser.id,
@@ -94,4 +100,16 @@ router.get("/calendar/month", async (req, res) => {
   const appUser = await ensureUser(String(req.telegramUser!.id));
   const marks = await getMonthMarks(appUser.id, parsed.data.month);
   return res.json(marks);
+});
+
+router.get("/calendar/history", async (req, res) => {
+  const schema = z.object({ limit: z.coerce.number().int().positive().max(120).optional() });
+  const parsed = schema.safeParse(req.query);
+  if (!parsed.success) {
+    return res.status(400).json({ error: "limit должен быть целым числом от 1 до 120" });
+  }
+
+  const appUser = await ensureUser(String(req.telegramUser!.id));
+  const history = await getHistory(appUser.id, parsed.data.limit ?? 30);
+  return res.json(history);
 });

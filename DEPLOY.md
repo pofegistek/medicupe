@@ -2,26 +2,27 @@
 
 ## 1. GitHub: код и Pages
 
-1. Убедитесь, что репозиторий содержит код (`main` branch).
-2. В репозитории откройте `Settings -> Pages`.
-3. В `Build and deployment` выберите `Source: GitHub Actions`.
-4. В `Settings -> Secrets and variables -> Actions -> Variables` добавьте:
+1. Убедитесь, что код в `main`.
+2. `Settings -> Pages`.
+3. `Build and deployment -> Source: GitHub Actions`.
+4. `Settings -> Secrets and variables -> Actions -> Variables`:
    - `VITE_API_BASE_URL=https://api.your-domain.com/api`
-5. После push в `main` workflow `Deploy Frontend to GitHub Pages` опубликует frontend.
+5. После push в `main` workflow `Deploy Frontend to GitHub Pages` публикует frontend.
 
-Ожидаемый URL:
+URL Mini App:
 - `https://pofegistek.github.io/medicupe/`
 
 ## 2. BotFather
 
 1. `/setmenubutton`
 2. Выбрать бота
-3. Вставить URL Mini App от GitHub Pages
+3. Вставить URL Mini App:
+   - `https://pofegistek.github.io/medicupe/`
 
 ## 3. VPS: backend + bot + db
 
-1. Клонировать проект на VPS.
-2. Создать `.env` в корне проекта (не в Git).
+1. Клонировать проект.
+2. Создать `.env` в корне (не коммитить).
 3. Заполнить минимум:
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_WEBAPP_BOT_TOKEN`
@@ -29,30 +30,29 @@
    - `MINI_APP_URL=https://pofegistek.github.io/medicupe/`
    - `BACKEND_PUBLIC_URL=https://api.your-domain.com`
    - `DATABASE_URL=file:./prisma/dev.db`
-4. Запустить:
+4. Запуск:
 
 ```bash
 docker compose up -d --build
 ```
 
-## 4. HTTPS для backend (для Pages -> API)
+## 4. HTTPS для backend (Pages -> API)
 
 ### Рекомендуемый production
 
-- Поднять домен, например `api.your-domain.com`
-- Настроить reverse proxy + TLS (Caddy/Nginx + Let's Encrypt)
-- Указать:
+- Домен API: `api.your-domain.com`
+- Reverse proxy + TLS (Caddy/Nginx + Let's Encrypt)
+- Обновить:
   - `BACKEND_PUBLIC_URL=https://api.your-domain.com`
-  - GitHub variable `VITE_API_BASE_URL=https://api.your-domain.com/api`
+  - `VITE_API_BASE_URL=https://api.your-domain.com/api`
 
 ### Временный тестовый вариант
 
-- Возможен публичный HTTPS туннель (например Cloudflare Tunnel)
-- Это временно, не production
+- HTTPS туннель (например Cloudflare Tunnel)
+- Только как временное решение
 
 ## 5. Важно
 
 - Не коммитить `.env`
-- Не хранить токены/пароли в репозитории
-- Не использовать IP сервера как `MINI_APP_URL`
-
+- Не хранить токены/пароли/ключи в репозитории
+- Не использовать IP VPS как `MINI_APP_URL`

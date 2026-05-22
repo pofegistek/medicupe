@@ -15,6 +15,12 @@ export type DayState = {
   evening: Record<string, boolean>;
 };
 
+export type HistoryItem = {
+  date: string;
+  morning: string[];
+  evening: string[];
+};
+
 async function request<T>(path: string, token: string, options?: RequestInit): Promise<T> {
   let res: Response;
   try {
@@ -81,4 +87,8 @@ export function fetchMonth(token: string, month: string) {
     `/calendar/month?month=${month}`,
     token
   );
+}
+
+export function fetchHistory(token: string, limit = 30) {
+  return request<HistoryItem[]>(`/calendar/history?limit=${limit}`, token);
 }

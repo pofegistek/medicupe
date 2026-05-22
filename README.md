@@ -14,9 +14,15 @@
 - Frontend: GitHub Pages (HTTPS, публичный URL)
 - Backend/API + Bot + DB: VPS
 
-Это снижает риск полной недоступности интерфейса при проблемах VPS: UI открывается с Pages, но без VPS не работает сохранение данных.
+Интерфейс открывается с Pages даже при проблемах VPS, но без backend не работают сохранение отметок и история.
 
-## Быстрый локальный запуск
+## Пользователи и приватность
+
+- Данные календаря и истории разделяются по `telegram user id`.
+- Backend берет пользователя только из проверенного `Telegram WebApp initData`.
+- Один пользователь не видит отметки другого.
+
+## Локальный запуск
 
 ```bash
 cp .env.example .env
@@ -51,11 +57,10 @@ npm run bot
 
 - Frontend на GitHub Pages: откроется.
 - Calendar/API/Bot/Admin: недоступны до восстановления VPS.
-- В UI показывается ошибка API, без белого экрана.
+- В UI показывается понятная русская ошибка API, без белого экрана.
 
 ## GitHub Pages URL
 
-Для репозитория `pofegistek/medicupe` URL будет:
+Для репозитория `pofegistek/medicupe` URL:
 
 `https://pofegistek.github.io/medicupe/`
-

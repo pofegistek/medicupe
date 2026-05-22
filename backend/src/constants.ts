@@ -1,5 +1,13 @@
 export const DAY_PARTS = ["morning", "evening"] as const;
 
+export const PROCEDURE_AVAILABILITY: Record<string, Array<(typeof DAY_PARTS)[number]>> = {
+  "air-shot": ["morning", "evening"],
+  booster: ["morning", "evening"],
+  mc: ["morning", "evening"],
+  "derma-shot": ["evening"],
+  retinol: ["evening"]
+};
+
 export const DEFAULT_PROCEDURES = [
   {
     slug: "air-shot",
@@ -19,7 +27,7 @@ export const DEFAULT_PROCEDURES = [
   },
   {
     slug: "mc",
-    name: "MC",
+    name: "MC Mode",
     description: "Режим комплексного воздействия по вашему плану.",
     note: "Описание можно изменить через админ-бота.",
     type: "режим устройства",

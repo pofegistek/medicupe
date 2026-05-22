@@ -2,60 +2,61 @@
 
 ## Что сделано
 
-- Создан и развивается проект в `/medicupe`.
-- Реализованы:
-  - Mini App (Сегодня, Календарь, Процедуры)
-  - Backend API
-  - SQLite + Prisma
-  - Telegram-бот админки
-- Бот обновлен:
-  - `/miniapp` и `/start` используют кнопку `Открыть Mini App`
-  - URL берется только из `MINI_APP_URL`
-  - при невалидном/пустом URL показывается безопасное сообщение
-  - IP не показывается в сообщениях бота
-- Добавлен workflow для GitHub Pages:
-  - `.github/workflows/deploy-pages.yml`
-- Frontend подготовлен для Pages:
-  - настраиваемый `base` через `VITE_BASE_PATH`
-  - fallback-ошибки при недоступном API
+- Frontend опубликован через GitHub Pages.
+- Исправлена инициализация Telegram WebApp:
+  - подключен официальный Telegram WebApp SDK в `frontend/index.html`;
+  - добавлено ожидание контекста Telegram перед auth;
+  - убрана ложная тревога при ранней инициализации.
+- Обновлен UX входа:
+  - внутри Telegram при наличии initData приложение авторизуется;
+  - вне Telegram показывается нейтральное сообщение, не красная ошибка.
+- Экран `Сегодня` обновлен:
+  - показывает актуальную дату;
+  - `Утро`: Air Shot, Booster, MC Mode;
+  - `Вечер`: Air Shot, Booster, MC Mode, Derma Shot, Ретинол;
+  - добавлены состояния загрузки/ошибки, пустых карточек без пояснения нет.
+- Добавлена вкладка `История`:
+  - показывает последние дни с отмеченными процедурами текущего пользователя;
+  - раздельно `Утро`/`Вечер`.
+- Backend обновлен:
+  - добавлен `GET /api/calendar/history`;
+  - добавлена серверная проверка доступности процедуры по времени суток;
+  - правила утро/вечер не только визуальные, но и API-валидируемые.
+- Разделение пользователей подтверждено в архитектуре:
+  - записи фильтруются по `telegram user id` из проверенного initData;
+  - данные между пользователями не смешиваются.
 
 ## Что проверено
 
-- Локальный git history и ветка `main` есть.
-- Remote настроен.
-- Секреты не должны попадать в tracked файлы (`.env` игнорируется).
-- На VPS контейнеры собирались и запускались.
-- GitHub Pages workflow успешно выполнен для `main`.
-- URL `https://pofegistek.github.io/medicupe/` отвечает `HTTP 200`.
+- Локальный git: изменения сохранены.
+- Проверено, что в tracked-файлах нет реальных секретов.
+- Проверен текущий URL Pages: `https://pofegistek.github.io/medicupe/`.
+- Проверено, что `MINI_APP_URL` на VPS установлен на URL GitHub Pages.
 
 ## Что осталось
 
-- Завершить push в GitHub (текущий remote отвечает `Repository not found`).
-- Включить GitHub Pages в репозитории.
-- Настроить production HTTPS для backend API на домене.
-- Обновить `.env` на VPS под финальные URL.
-- Проверить Mini App в Telegram после `/setmenubutton`.
+- Для полноценных записей из Pages нужен production HTTPS backend API.
+- После настройки HTTPS API нужно обновить `VITE_API_BASE_URL` в GitHub Actions Variables.
+- Проверить живой сценарий в Telegram на телефоне после обновления frontend и backend.
 
 ## Что нужно от владельца
 
-- Подтвердить правильный URL репозитория и доступ для push.
-- Подтвердить домен для production API (`https://api...`).
-- Подтвердить, что в BotFather будет установлен URL GitHub Pages.
+- Production домен для API (`https://api.<domain>`).
+- Подтверждение CORS/HTTPS настроек reverse proxy.
 
 ## Ручные действия
 
 ### GitHub
 
-- Проверить репозиторий и права на push.
-- Включить Pages (`Settings -> Pages -> Source: GitHub Actions`).
-- Добавить Actions Variable: `VITE_API_BASE_URL`.
+- `Settings -> Secrets and variables -> Actions -> Variables`
+- Добавить/обновить `VITE_API_BASE_URL=https://api.<domain>/api`
 
-### Telegram / BotFather
+### BotFather
 
-- `/setmenubutton` -> URL GitHub Pages Mini App.
+- `/setmenubutton` -> URL: `https://pofegistek.github.io/medicupe/`
 
 ### VPS
 
-- Держать только backend/bot/db.
+- Поддерживать backend/bot/db.
 - Настроить HTTPS reverse proxy для API.
-- `MINI_APP_URL` на VPS обновлен на `https://pofegistek.github.io/medicupe/`.
+
