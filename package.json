@@ -1,0 +1,23 @@
+{
+  "name": "medicube",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:backend dev:frontend",
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "build": "npm-run-all build:backend build:frontend",
+    "build:backend": "npm --workspace backend run build",
+    "build:frontend": "npm --workspace frontend run build",
+    "start": "npm --workspace backend run start",
+    "bot": "npm --workspace backend run bot",
+    "prisma:migrate": "npm --workspace backend run prisma:migrate",
+    "prisma:generate": "npm --workspace backend run prisma:generate"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
