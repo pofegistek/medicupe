@@ -1,77 +1,36 @@
 # Medicube Telegram Mini App
 
-Полноценное Telegram Mini App для личного трекинга процедур `Medicube AGE-R Booster Pro` и применения ретинола по дням.
+Мини-приложение Telegram для трекинга процедур `Medicube AGE-R Booster Pro` и ретинола по календарю.
 
-## Что уже реализовано
+## Что в проекте
 
-- Mini App на русском языке с разделами:
-  - `Сегодня`
-  - `Календарь`
-  - `Процедуры`
-- Отметки `утро/вечер` по процедурам с сохранением в БД.
-- Визуальные отметки в календаре по дням, где есть прогресс.
-- Сохранение прогресса по `telegram user id`.
-- Backend API с проверкой `Telegram WebApp initData`.
-- Telegram-бот админки (доступ только для `ADMIN_TELEGRAM_ID`) для:
-  - просмотра процедур;
-  - редактирования описания;
-  - редактирования заметки;
-  - включения/скрытия процедуры.
-
-## Структура
-
-- `frontend/` - Telegram Mini App (React + Vite + TypeScript)
+- `frontend/` - Mini App (React + Vite + TypeScript)
 - `backend/` - API + Prisma + SQLite
-- `backend/src/bot.ts` - админ-бот
-- `docs/` - дополнительная документация
-- `DEPLOY.md` - пошаговый деплой
-- `PROJECT_STATUS.md` - актуальный статус
+- `backend/src/bot.ts` - Telegram-бот (админ + кнопка Mini App)
+- `.github/workflows/deploy-pages.yml` - автодеплой frontend в GitHub Pages
 
-## Технологии
+## Архитектура деплоя
 
-- Frontend: React, Vite, TypeScript
-- Backend: Node.js, Express, TypeScript
-- Bot: Telegraf
-- DB: Prisma ORM + SQLite (с возможностью перейти на PostgreSQL)
+- Frontend: GitHub Pages (HTTPS, публичный URL)
+- Backend/API + Bot + DB: VPS
 
-## Локальный запуск
+Это снижает риск полной недоступности интерфейса при проблемах VPS: UI открывается с Pages, но без VPS не работает сохранение данных.
 
-1. Скопируйте переменные окружения:
+## Быстрый локальный запуск
 
 ```bash
 cp .env.example .env
-```
-
-2. Заполните `.env` реальными значениями.
-
-3. Установите зависимости:
-
-```bash
 npm install
 npm --workspace backend install
 npm --workspace frontend install
-```
-
-4. Создайте БД и Prisma клиент:
-
-```bash
 npm run prisma:generate
 npm run prisma:migrate
-```
-
-5. Запустите backend и frontend:
-
-```bash
 npm run dev
-```
-
-6. Отдельно запуск админ-бота:
-
-```bash
+# отдельно бот
 npm run bot
 ```
 
-## Важные переменные окружения
+## Переменные окружения
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_WEBAPP_BOT_TOKEN`
@@ -80,10 +39,23 @@ npm run bot
 - `BACKEND_PUBLIC_URL`
 - `DATABASE_URL`
 - `VITE_API_BASE_URL`
+- `VITE_BASE_PATH`
 
-## Миграция SQLite -> PostgreSQL
+## Mini App URL в боте
 
-- В `backend/prisma/schema.prisma` поменять datasource provider на `postgresql`.
-- В `.env` указать `DATABASE_URL=postgresql://...`.
-- Перезапустить Prisma миграции в новой среде.
-- Бизнес-логика и API остаются теми же.
+- `/miniapp` и `/start` используют кнопку `Открыть Mini App`.
+- URL берется только из `MINI_APP_URL`.
+- Если URL не настроен или небезопасный, бот не показывает ссылку и пишет понятное сообщение.
+
+## Что будет при падении VPS
+
+- Frontend на GitHub Pages: откроется.
+- Calendar/API/Bot/Admin: недоступны до восстановления VPS.
+- В UI показывается ошибка API, без белого экрана.
+
+## GitHub Pages URL
+
+Для репозитория `pofegistek/medicube` URL будет:
+
+`https://pofegistek.github.io/medicube/`
+

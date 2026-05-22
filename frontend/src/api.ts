@@ -16,14 +16,19 @@ export type DayState = {
 };
 
 async function request<T>(path: string, token: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(options?.headers || {})
-    }
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        ...(options?.headers || {})
+      }
+    });
+  } catch {
+    throw new Error("Сервер временно недоступен. Проверьте подключение к API.");
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -33,11 +38,16 @@ async function request<T>(path: string, token: string, options?: RequestInit): P
 }
 
 export async function login(initData: string): Promise<string> {
-  const res = await fetch(`${API_BASE}/auth/telegram`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ initData })
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/auth/telegram`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ initData })
+    });
+  } catch {
+    throw new Error("Сервер временно недоступен. Попробуйте позже.");
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));

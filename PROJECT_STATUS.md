@@ -1,91 +1,59 @@
 # PROJECT STATUS - Medicube
 
-## 1. Что уже сделано
+## Что сделано
 
-- Создан отдельный проект `medicube` в новой папке.
-- Реализован backend API:
-  - авторизация по Telegram WebApp initData;
-  - процедуры (`GET /api/procedures`);
-  - дневные отметки (`GET/PUT /api/calendar/day`);
-  - месячные отметки (`GET /api/calendar/month`).
-- Реализована БД через Prisma:
-  - `User`
-  - `Procedure`
-  - `DayEntry`
-- Добавлены 5 процедур для первой версии:
-  - Air Shot
-  - Booster
-  - MC
-  - Derma Shot
-  - Ретинол
-- Реализован Mini App frontend (русский интерфейс):
-  - экран Сегодня
-  - экран Календарь
-  - экран Процедуры
-- Реализован Telegram-бот админки:
-  - только для `ADMIN_TELEGRAM_ID`;
-  - редактирование описания/заметки;
-  - включение/скрытие процедуры.
-- Добавлены документы:
-  - `README.md`
-  - `DEPLOY.md`
-  - `.env.example`
-  - `.gitignore`
+- Создан и развивается проект в `/medicube`.
+- Реализованы:
+  - Mini App (Сегодня, Календарь, Процедуры)
+  - Backend API
+  - SQLite + Prisma
+  - Telegram-бот админки
+- Бот обновлен:
+  - `/miniapp` и `/start` используют кнопку `Открыть Mini App`
+  - URL берется только из `MINI_APP_URL`
+  - при невалидном/пустом URL показывается безопасное сообщение
+  - IP не показывается в сообщениях бота
+- Добавлен workflow для GitHub Pages:
+  - `.github/workflows/deploy-pages.yml`
+- Frontend подготовлен для Pages:
+  - настраиваемый `base` через `VITE_BASE_PATH`
+  - fallback-ошибки при недоступном API
 
-## 2. Что проверено
+## Что проверено
 
-- Проверена структура файлов проекта.
-- Проверена логика защиты админ-команд по Telegram ID.
-- Проверена серверная валидация входных данных.
-- Проверено отсутствие хардкода секретов в исходниках.
-- Выполнен локальный git commit проекта.
-- Проверен push в GitHub: текущий SSH-ключ не имеет доступа к репозиторию.
-- Проверен доступ на VPS `89.22.236.42`: вход `root` отклоняется (publickey), парольный вход отключен.
+- Локальный git history и ветка `main` есть.
+- Remote настроен.
+- Секреты не должны попадать в tracked файлы (`.env` игнорируется).
+- На VPS контейнеры собирались и запускались.
 
-## 3. Что осталось
+## Что осталось
 
-- Установить зависимости и запустить локально в целевой среде.
-- Выполнить Prisma миграцию и проверить фактическую запись в БД.
-- Подключить реальный бот в Telegram (BotFather).
-- Проверить Mini App в реальном Telegram-клиенте на телефоне.
-- Настроить продакшен HTTPS домены для frontend/backend.
-- Получить рабочий SSH-доступ к GitHub (или PAT для HTTPS push).
-- Получить рабочий SSH-доступ к VPS (логин + ключ, который реально добавлен в `authorized_keys`).
+- Завершить push в GitHub (текущий remote отвечает `Repository not found`).
+- Включить GitHub Pages в репозитории.
+- Настроить production HTTPS для backend API на домене.
+- Обновить `.env` на VPS под финальные URL.
+- Проверить Mini App в Telegram после `/setmenubutton`.
 
-## 4. Какие данные нужны от владельца проекта
+## Что нужно от владельца
 
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_WEBAPP_BOT_TOKEN` (можно тот же токен, если один бот)
-- `ADMIN_TELEGRAM_ID`
-- `MINI_APP_URL`
-- `BACKEND_PUBLIC_URL`
-- Решение по домену/HTTPS
+- Подтвердить правильный URL репозитория и доступ для push.
+- Подтвердить домен для production API (`https://api...`).
+- Подтвердить, что в BotFather будет установлен URL GitHub Pages.
 
-## 5. Какие ручные действия нужны
+## Ручные действия
 
-### В Telegram
+### GitHub
 
-- Создать бота через BotFather.
-- Настроить `Menu Button` с URL Mini App.
-- Проверить, что админ-команды доступны только администратору.
+- Проверить репозиторий и права на push.
+- Включить Pages (`Settings -> Pages -> Source: GitHub Actions`).
+- Добавить Actions Variable: `VITE_API_BASE_URL`.
 
-### В GitHub
+### Telegram / BotFather
 
-- Создать репозиторий и загрузить проект.
-- Проверить, что `.env` не в коммитах.
-- Настроить приватность/доступы при необходимости.
-- Добавить публичный SSH-ключ в GitHub аккаунт:
-  - `/Users/artemzolobov/.ssh/id_ed25519_secure_892223642.pub`
-  - либо предоставить другой ключ/способ авторизации для `git push`.
+- `/setmenubutton` -> URL GitHub Pages Mini App.
 
-### На VPS
+### VPS
 
-- Установить Docker и Docker Compose.
-- Создать `.env`.
-- Запустить `docker compose up -d --build`.
-- Настроить reverse proxy + TLS.
-- Настроить backup SQLite файла.
-- Проверить SSH-доступ:
-  - сообщить корректный Linux user (не обязательно `root`);
-  - добавить публичный ключ в `~/.ssh/authorized_keys` этого пользователя;
-  - либо дать альтернативный способ подключения.
+- Держать только backend/bot/db.
+- Настроить HTTPS reverse proxy для API.
+

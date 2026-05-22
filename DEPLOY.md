@@ -1,98 +1,58 @@
-# DEPLOY Medicube (VPS)
+# DEPLOY Medicube
 
-Инструкция с простыми шагами для запуска Mini App и бота в продакшене.
+## 1. GitHub: код и Pages
 
-## 1. Что сделать в GitHub
+1. Убедитесь, что репозиторий содержит код (`main` branch).
+2. В репозитории откройте `Settings -> Pages`.
+3. В `Build and deployment` выберите `Source: GitHub Actions`.
+4. В `Settings -> Secrets and variables -> Actions -> Variables` добавьте:
+   - `VITE_API_BASE_URL=https://api.your-domain.com/api`
+5. После push в `main` workflow `Deploy Frontend to GitHub Pages` опубликует frontend.
 
-1. Создать новый репозиторий.
-2. Загрузить проект `medicube`.
-3. Убедиться, что `.env` не попал в репозиторий.
-4. Проверить, что в репозитории есть:
-   - `.env.example`
-   - `.gitignore`
-   - `README.md`
-   - `DEPLOY.md`
-   - `PROJECT_STATUS.md`
+Ожидаемый URL:
+- `https://pofegistek.github.io/medicube/`
 
-## 2. Что сделать у BotFather
+## 2. BotFather
 
-1. Создать бота: `/newbot`.
-2. Получить `TELEGRAM_BOT_TOKEN`.
-3. Настроить Mini App:
-   - `/setmenubutton`
-   - выбрать бота
-   - указать URL Mini App (`https://miniapp.example.com`)
-4. Если используется отдельный бот для Mini App, убедиться, что токен указан в `TELEGRAM_WEBAPP_BOT_TOKEN`.
+1. `/setmenubutton`
+2. Выбрать бота
+3. Вставить URL Mini App от GitHub Pages
 
-## 3. Что сделать на VPS
+## 3. VPS: backend + bot + db
 
-1. Установить Docker и Docker Compose.
-2. Клонировать репозиторий.
-3. Перейти в папку проекта `medicube`.
-4. Создать `.env` рядом с `docker-compose.yml`.
-5. Запустить:
+1. Клонировать проект на VPS.
+2. Создать `.env` в корне проекта (не в Git).
+3. Заполнить минимум:
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_WEBAPP_BOT_TOKEN`
+   - `ADMIN_TELEGRAM_ID`
+   - `MINI_APP_URL=https://pofegistek.github.io/medicube/`
+   - `BACKEND_PUBLIC_URL=https://api.your-domain.com`
+   - `DATABASE_URL=file:./prisma/dev.db`
+4. Запустить:
 
 ```bash
 docker compose up -d --build
 ```
 
-6. Проверить сервисы:
+## 4. HTTPS для backend (для Pages -> API)
 
-```bash
-docker compose ps
-docker compose logs -f backend
-docker compose logs -f bot
-```
+### Рекомендуемый production
 
-## 4. Где хранить .env
+- Поднять домен, например `api.your-domain.com`
+- Настроить reverse proxy + TLS (Caddy/Nginx + Let's Encrypt)
+- Указать:
+  - `BACKEND_PUBLIC_URL=https://api.your-domain.com`
+  - GitHub variable `VITE_API_BASE_URL=https://api.your-domain.com/api`
 
-- Только на сервере и локально у владельца.
-- Не коммитить в Git.
-- Рекомендуется хранить резервную копию в менеджере паролей/секретов.
+### Временный тестовый вариант
 
-## 5. Как проверить, что бот работает
+- Возможен публичный HTTPS туннель (например Cloudflare Tunnel)
+- Это временно, не production
 
-1. Написать `/start` вашему боту.
-2. С админского Telegram ID выполнить `/procedures`.
-3. Попробовать изменить описание и заметку.
-4. Проверить, что не-админ получает `Доступ запрещен`.
+## 5. Важно
 
-## 6. Как проверить, что Mini App открывается в Telegram
+- Не коммитить `.env`
+- Не хранить токены/пароли в репозитории
+- Не использовать IP сервера как `MINI_APP_URL`
 
-1. Открыть бота в Telegram.
-2. Нажать кнопку меню (`Menu Button`) и открыть Mini App.
-3. Убедиться, что показываются экраны:
-   - Сегодня
-   - Календарь
-   - Процедуры
-4. Поставить чекбокс, закрыть Mini App, открыть снова.
-5. Убедиться, что отметка сохранилась.
-
-## HTTPS
-
-Mini App в Telegram должен открываться по `https://`.
-
-Варианты:
-- Nginx + Certbot
-- Caddy
-- Cloudflare Tunnel
-
-Главное: домен Mini App и API должны быть доступны извне и иметь валидный TLS сертификат.
-
-## Обновления после изменений
-
-```bash
-git pull
-docker compose up -d --build
-```
-
-## Как не потерять БД и прогресс
-
-SQLite файл находится в томе/папке `backend/prisma`.
-
-Резервное копирование:
-```bash
-cp backend/prisma/dev.db /root/backups/medicube_dev_$(date +%F).db
-```
-
-Рекомендуется настроить ежедневный cron backup.

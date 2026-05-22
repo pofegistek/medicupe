@@ -16,6 +16,38 @@ function isAdmin(telegramId: string) {
   return telegramId === adminId;
 }
 
+function isValidPublicMiniAppUrl(url: string): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false;
+
+    const host = parsed.hostname;
+    const ipv4 = /^(\d{1,3}\.){3}\d{1,3}$/;
+    const ipv6 = /:/;
+    if (ipv4.test(host) || ipv6.test(host)) return false;
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function miniAppKeyboard(url: string) {
+  return Markup.inlineKeyboard([[Markup.button.webApp("Открыть Mini App", url)]]);
+}
+
+async function sendMiniAppEntry(ctx: { reply: (text: string, extra?: unknown) => Promise<unknown> }) {
+  if (isValidPublicMiniAppUrl(config.miniAppUrl)) {
+    await ctx.reply("Откройте Mini App по кнопке ниже.", miniAppKeyboard(config.miniAppUrl));
+    return;
+  }
+
+  await ctx.reply(
+    "Mini App пока не настроен. Укажите публичный HTTPS URL в MINI_APP_URL (рекомендуется GitHub Pages)."
+  );
+}
+
 async function sendProceduresList(chatId: number) {
   const procedures = await prisma.procedure.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
   const rows = procedures.map((p: { id: number; name: string }) => [
@@ -26,19 +58,19 @@ async function sendProceduresList(chatId: number) {
 
 bot.start(async (ctx) => {
   const userId = String(ctx.from?.id || "");
-  if (!isAdmin(userId)) {
-    await ctx.reply("Доступ запрещен.");
+  if (isAdmin(userId)) {
+    await ctx.reply(
+      "Админ-панель Medicube. Доступные команды:\n/procedures - список процедур\n/miniapp - открыть Mini App"
+    );
+    await sendMiniAppEntry(ctx);
     return;
   }
-  await ctx.reply(
-    "Админ-панель Medicube. Доступные команды:\n/procedures - список процедур\n/miniapp - ссылка на Mini App"
-  );
+
+  await sendMiniAppEntry(ctx);
 });
 
 bot.command("miniapp", async (ctx) => {
-  const userId = String(ctx.from?.id || "");
-  if (!isAdmin(userId)) return ctx.reply("Доступ запрещен.");
-  await ctx.reply(`Mini App: ${config.miniAppUrl || "не указан MINI_APP_URL"}`);
+  await sendMiniAppEntry(ctx);
 });
 
 bot.command("procedures", async (ctx) => {
