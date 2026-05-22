@@ -1,4 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
+const BACKEND_NOT_CONNECTED_MESSAGE =
+  "Сервер отметок еще не подключен. Интерфейс открыт, но сохранение календаря пока недоступно.";
 
 export type Procedure = {
   id: number;
@@ -52,12 +54,27 @@ export async function login(initData: string): Promise<string> {
       body: JSON.stringify({ initData })
     });
   } catch {
-    throw new Error("Сервер временно недоступен. Попробуйте позже.");
+    throw new Error(BACKEND_NOT_CONNECTED_MESSAGE);
   }
 
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || "Ошибка авторизации");
+    const body = await res.json().catch(() => null);
+    if (body?.error) {
+      const authLikeError =
+        String(body.error).includes("init data") ||
+        String(body.error).includes("подпись") ||
+        String(body.error).includes("Telegram");
+      if (authLikeError) {
+        throw new Error("Ошибка авторизации Telegram. Закройте и заново откройте Mini App в Telegram.");
+      }
+      throw new Error(body.error);
+    }
+
+    if (res.status >= 500 || res.status === 404 || res.status === 403) {
+      throw new Error(BACKEND_NOT_CONNECTED_MESSAGE);
+    }
+
+    throw new Error("Ошибка авторизации Telegram. Закройте и заново откройте Mini App в Telegram.");
   }
 
   const data = await res.json();

@@ -59,4 +59,4 @@
 
 - Поддерживать backend/bot/db.
 - Настроить HTTPS reverse proxy для API.
-
+- Временный HTTPS tunnel для API поднят (Cloudflare Quick Tunnel), пригоден для теста, но не для постоянной работы.
