@@ -7,6 +7,7 @@ import { router } from "./routes.js";
 import { ensureDefaultProcedures, ensureDefaultSupplements } from "./seed.js";
 
 const app = express();
+app.disable("x-powered-by");
 
 app.set("trust proxy", 1);
 
