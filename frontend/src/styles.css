@@ -1,37 +1,67 @@
 :root {
-  --bg: #f4f7fb;
-  --card: #ffffff;
-  --text: #1d2636;
-  --muted: #7a8393;
-  --accent: #1c8c84;
-  --accent-soft: #d5f0ed;
-  --border: #dfe5ee;
+  --bg: #0b1118;
+  --bg-elev: #121a24;
+  --card: #141f2a;
+  --card-soft: #1a2633;
+  --text: #e8edf4;
+  --muted: #98a7ba;
+  --accent: #4da3ff;
+  --accent-strong: #2d7fd7;
+  --ok: #63d3a2;
+  --warn: #f2bf62;
+  --danger: #ff7d7d;
+  --border: #263342;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: "Segoe UI", "SF Pro Text", sans-serif;
-  background: linear-gradient(180deg, #eef6ff 0%, var(--bg) 35%, #f8fafc 100%);
+  font-family: "SF Pro Text", "Segoe UI", "Inter", sans-serif;
+  background:
+    radial-gradient(1200px 460px at 20% -10%, #1f2f46 0%, rgba(31, 47, 70, 0) 70%),
+    radial-gradient(900px 520px at 100% -20%, #172738 0%, rgba(23, 39, 56, 0) 70%),
+    var(--bg);
   color: var(--text);
 }
 
 .app {
-  max-width: 560px;
+  max-width: 580px;
   margin: 0 auto;
-  padding: 12px 12px 28px;
+  padding: 12px 12px 34px;
+}
+
+.topbar {
+  padding: 14px;
+}
+
+.app-kicker {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #aac7e6;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .topbar h1 {
-  margin: 8px 0 4px;
+  margin: 8px 0 6px;
+  font-size: 24px;
+  line-height: 1.2;
 }
 
 .topbar p {
   margin: 0;
   color: var(--muted);
+  font-size: 14px;
   text-transform: capitalize;
 }
 
@@ -42,84 +72,160 @@ body {
 }
 
 .tabs-4 {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .tabs button {
-  padding: 10px 6px;
+  min-height: 46px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #fff;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.tabs button.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: #0f5f59;
+  background: var(--bg-elev);
+  color: #c3d1e0;
+  font-size: 14px;
   font-weight: 600;
 }
 
+.tabs button.active {
+  border-color: #3f5f80;
+  background: linear-gradient(180deg, #223247 0%, #1a2736 100%);
+  color: #f4f9ff;
+}
+
 .card {
-  background: var(--card);
+  background: linear-gradient(180deg, #182331 0%, #141f2a 100%);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
-.check-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 8px 0;
+.card h3 {
+  margin: 0;
+  font-size: 18px;
 }
 
-.date-switcher {
-  display: flex;
-  justify-content: space-between;
+.card-sub {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tile-list {
+  display: grid;
   gap: 8px;
 }
 
+.tile {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid #324356;
+  border-radius: 12px;
+  background: var(--card-soft);
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 14px;
+  text-align: left;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.08s ease;
+}
+
+.tile:active {
+  transform: scale(0.99);
+}
+
+.tile.active {
+  border-color: #4d8bc5;
+  background: linear-gradient(180deg, #223953 0%, #1d3248 100%);
+}
+
+.tile-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tile-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid #4e6075;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9fb0c4;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.tile-check.on {
+  border-color: #78b5f0;
+  background: #2e5f91;
+  color: #ecf7ff;
+}
+
+.date-switcher {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
 .date-switcher button {
-  flex: 1;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-weight: 600;
 }
 
 button {
-  min-height: 40px;
+  min-height: 42px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--bg-elev);
+  color: var(--text);
 }
 
 .save-btn {
   width: 100%;
-  margin-top: 10px;
-  font-weight: 600;
-  min-height: 44px;
+  margin-top: 12px;
+  font-weight: 700;
+  min-height: 48px;
+  border-color: #4b78a3;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: #f6fbff;
 }
 
 .save-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
+}
+
+.unsaved,
+.saved,
+.save-error {
+  margin: 9px 0 0;
+  font-size: 13px;
 }
 
 .unsaved {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: #7a4f00;
+  color: var(--warn);
 }
 
 .saved {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: #0f5f59;
+  color: var(--ok);
 }
 
 .save-error {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: #8a2525;
+  color: var(--danger);
 }
 
 .calendar-grid {
@@ -135,25 +241,29 @@ button {
 }
 
 .day {
-  min-height: 56px;
-  padding: 6px;
+  min-height: 60px;
+  padding: 6px 4px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
 }
 
 .day.muted {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .day.selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: #5c8fc2;
+  background: #22364b;
 }
 
 .day small {
   font-size: 10px;
-  color: #0f5f59;
+  color: #a8c9ea;
 }
 
 .meta,
@@ -167,20 +277,41 @@ button {
   flex-direction: column;
 }
 
-.error {
-  background: #ffe5e5;
-  color: #8a2525;
-  border: 1px solid #eebbbb;
+.error,
+.info {
   border-radius: 12px;
-  padding: 10px;
+  padding: 11px 12px;
   margin: 8px 0;
+  font-size: 14px;
+}
+
+.error {
+  background: rgba(176, 48, 48, 0.2);
+  color: #ffc2c2;
+  border: 1px solid rgba(215, 84, 84, 0.45);
 }
 
 .info {
-  background: #edf5ff;
-  color: #214a74;
-  border: 1px solid #c9ddf5;
-  border-radius: 12px;
-  padding: 10px;
-  margin: 8px 0;
+  background: rgba(66, 110, 155, 0.22);
+  color: #cae5ff;
+  border: 1px solid rgba(99, 145, 194, 0.4);
+}
+
+@media (max-width: 420px) {
+  .app {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .topbar h1 {
+    font-size: 22px;
+  }
+
+  .tabs button {
+    font-size: 13px;
+  }
+
+  .tile-name {
+    font-size: 15px;
+  }
 }

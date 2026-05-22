@@ -50,6 +50,22 @@ function safeProcedureName(p: Procedure) {
   return p.name;
 }
 
+function triggerToggleHaptic() {
+  try {
+    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.("light");
+  } catch {
+    // no-op if haptic is unavailable
+  }
+}
+
+function triggerSuccessHaptic() {
+  try {
+    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.("success");
+  } catch {
+    // no-op if haptic is unavailable
+  }
+}
+
 export function App() {
   const [tab, setTab] = useState<Tab>("today");
   const [token, setToken] = useState<string>("");
@@ -206,6 +222,8 @@ export function App() {
   };
 
   const toggleDraft = (dayPart: DayPart, procedureId: number, checked: boolean) => {
+    triggerToggleHaptic();
+
     const key = String(procedureId);
     setDraftDayState((prev) => ({
       ...prev,
@@ -257,6 +275,7 @@ export function App() {
       setMonthMarks(freshMonth);
       setStatus("Сохранено");
       setError("");
+      triggerSuccessHaptic();
     } catch {
       setStatus("Не удалось сохранить. Проверьте соединение и попробуйте еще раз.");
     } finally {
@@ -268,7 +287,9 @@ export function App() {
     if (proceduresLoading || dayLoading) {
       return (
         <section className="card">
-          <h3>{title}</h3>
+          <div className="card-head">
+            <h3>{title}</h3>
+          </div>
           <p className="hint">Загрузка данных...</p>
         </section>
       );
@@ -277,7 +298,9 @@ export function App() {
     if (!token) {
       return (
         <section className="card">
-          <h3>{title}</h3>
+          <div className="card-head">
+            <h3>{title}</h3>
+          </div>
           <p className="hint">Для отметок нужен доступ к API и авторизация Telegram.</p>
         </section>
       );
@@ -286,7 +309,9 @@ export function App() {
     if (list.length === 0) {
       return (
         <section className="card">
-          <h3>{title}</h3>
+          <div className="card-head">
+            <h3>{title}</h3>
+          </div>
           <p className="hint">Список процедур пока недоступен.</p>
         </section>
       );
@@ -298,17 +323,30 @@ export function App() {
 
     return (
       <section className="card">
-        <h3>{title}</h3>
-        {list.map((p) => (
-          <label key={`${dayPart}-${p.id}`} className="check-row">
-            <input
-              type="checkbox"
-              checked={Boolean(draftDayState[dayPart][String(p.id)])}
-              onChange={(e) => toggleDraft(dayPart, p.id, e.target.checked)}
-            />
-            <span>{safeProcedureName(p)}</span>
-          </label>
-        ))}
+        <div className="card-head">
+          <h3>{title}</h3>
+          <span className="card-sub">{dayPart === "morning" ? "Утренний чек-ин" : "Вечерний чек-ин"}</span>
+        </div>
+
+        <div className="tile-list">
+          {list.map((p) => {
+            const checked = Boolean(draftDayState[dayPart][String(p.id)]);
+            return (
+              <button
+                key={`${dayPart}-${p.id}`}
+                type="button"
+                className={`tile ${checked ? "active" : ""}`}
+                onClick={() => toggleDraft(dayPart, p.id, !checked)}
+                aria-pressed={checked}
+              >
+                <span className="tile-name">{safeProcedureName(p)}</span>
+                <span className={`tile-check ${checked ? "on" : ""}`} aria-hidden="true">
+                  {checked ? "✓" : "○"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
         {dirty && <p className="unsaved">Есть несохраненные изменения</p>}
 
@@ -327,8 +365,9 @@ export function App() {
 
   return (
     <main className="app">
-      <header className="topbar">
-        <h1>Medicube</h1>
+      <header className="topbar card">
+        <span className="app-kicker">Medicube</span>
+        <h1>Сегодняшний уход</h1>
         <p>{ruDateLabel(selectedDate)}</p>
       </header>
 
@@ -349,7 +388,7 @@ export function App() {
 
       {tab === "today" && (
         <>
-          <section className="card date-switcher">
+          <section className="date-switcher">
             <button onClick={() => changeDateWithGuard(subDays(selectedDate, 1))}>← Вчера</button>
             <button onClick={() => changeDateWithGuard(new Date())}>Сегодня</button>
             <button onClick={() => changeDateWithGuard(addDays(selectedDate, 1))}>Завтра →</button>
@@ -407,7 +446,11 @@ export function App() {
 
           {!historyLoading && history.map((item) => (
             <article key={item.date} className="card">
-              <h3>{new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(item.date))}</h3>
+              <h3>
+                {new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(
+                  new Date(item.date)
+                )}
+              </h3>
               <p className="meta">Утро: {item.morning.length ? item.morning.join(", ") : "нет отметок"}</p>
               <p className="meta">Вечер: {item.evening.length ? item.evening.join(", ") : "нет отметок"}</p>
             </article>
