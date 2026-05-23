@@ -63,12 +63,18 @@ async function request<T>(path: string, token: string, options?: RequestInit): P
         ...(options?.headers || {})
       }
     });
-  } catch {
+  } catch (error) {
+    console.error("[Medicube API] network error", { path, error });
     throw new Error("Сервер временно недоступен. Проверьте подключение к API.");
   }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    console.error("[Medicube API] request failed", {
+      path,
+      status: res.status,
+      bodyError: body?.error || null
+    });
     throw new Error(body.error || "Ошибка API");
   }
   return res.json();
@@ -82,12 +88,17 @@ export async function login(initData: string): Promise<string> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ initData })
     });
-  } catch {
+  } catch (error) {
+    console.error("[Medicube Auth] network error", { error });
     throw new Error(BACKEND_NOT_CONNECTED_MESSAGE);
   }
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);
+    console.error("[Medicube Auth] auth failed", {
+      status: res.status,
+      bodyError: body?.error || null
+    });
     if (body?.error) {
       const authLikeError =
         String(body.error).includes("init data") ||

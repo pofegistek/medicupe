@@ -24,6 +24,16 @@ function parseAdminIds() {
   return Array.from(new Set(merged));
 }
 
+function normalizeOrigin(value: string) {
+  const raw = value.trim();
+  if (!raw) return "";
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return raw.replace(/\/+$/, "");
+  }
+}
+
 const adminTelegramIds = parseAdminIds();
 if (adminTelegramIds.length === 0) {
   throw new Error("Missing env var: ADMIN_TELEGRAM_ID or ADMIN_TELEGRAM_IDS");
@@ -37,7 +47,7 @@ export const config = {
   corsAllowedOrigins: (process.env.CORS_ALLOWED_ORIGINS ||
     "https://pofegistek.github.io,http://localhost:5173,http://127.0.0.1:5173")
     .split(",")
-    .map((value) => value.trim())
+    .map(normalizeOrigin)
     .filter(Boolean),
   telegramAuthMaxAgeSeconds: Number(process.env.TELEGRAM_AUTH_MAX_AGE_SECONDS || 86400),
   apiRateLimitWindowMs: Number(process.env.API_RATE_LIMIT_WINDOW_MS || 60000),
